@@ -79,11 +79,11 @@ The prototype chain walk is inside step 3: if we don't find the property as an o
 
 Let's look at how this algorithm works when we access `o2.foo`. First we invoke `OrdinaryGet` with `O` being `o2` and `P` being `"foo"`. `O.[[GetOwnProperty]]("foo")` returns `undefined`, since `o2` doesn't have an own property called `"foo"`, so we take the if branch in step 3. In step 3.a, we set `parent` to the prototype of `o2` which is `o1`. `parent` is not `null`, so we don't return in step 3.b. In step 3.c, we call the parent's `[[Get]]` method with property key `"foo"`, and return whatever it returns.
 
-The parent (`o1`) is an ordinary object, so its `[[Get]]` method invokes `OrdinaryGet` again, this time with `O` being `o1` and `P` being `"foo"`. `o1` has an own property called `"foo"`, so in step 2, `O.[[GetOwnProperty]]("foo")` returns the associated Property Descriptor.
+The parent (`o1`) is an ordinary object, so its `[[Get]]` method invokes `OrdinaryGet` again, this time with `O` being `o1` and `P` being `"foo"`. `o1` has an own property called `"foo"`, so in step 2, `O.[[GetOwnProperty]]("foo")` returns the associated Property Descriptor and we store it in `desc`.
 
-[Property Descriptor](https://tc39.es/ecma262/#sec-property-descriptor-specification-type) is a specification type. Data Property Descriptors store the value of the property directly in the `[[Value]]` field. Accessor Property Descriptors store the accessor functions in fields `[[Get]]` and/or `[[Set]]`. In this case, the Property Descriptor describing `"foo"` is a data Property Descriptor.
+[Property Descriptor](https://tc39.es/ecma262/#sec-property-descriptor-specification-type) is a specification type. Data Property Descriptors store the value of the property directly in the `[[Value]]` field. Accessor Property Descriptors store the accessor functions in fields `[[Get]]` and/or `[[Set]]`. In this case, the Property Descriptor associated with `"foo"` is a data Property Descriptor.
 
-The Property Descriptor returned by `O.[[GetOwnProperty]]("foo")` in step 2 is not `undefined`, so we don't take the if branch in step 3. Next we execute step 4. The Property Descriptor is a data Property Descriptor, so we return its `[[Value]]` field, `99`, in step 4, and we're done.
+The data Property Descriptor we stored in `desc` in step 2 is not `undefined`, so we don't take the if branch in step 3. Next we execute step 4. The Property Descriptor is a data Property Descriptor, so we return its `[[Value]]` field, `99`, in step 4, and we're done.
 
 ## What's `Receiver` and where is it coming from?
 
