@@ -32,7 +32,7 @@ For example:
 const o1 = {'foo' : 99};
 const o2 = {};
 Object.setPrototypeOf(o2, o1);
-o2.foo; // 99
+o2.foo; // will return 99
 ```
 
 ## Where's the prototype walk defined?
@@ -79,7 +79,11 @@ The prototype chain walk is inside step 3: if we don't find the property as an o
 
 Let's look at how this algorithm works when we access `o2.foo`. First we invoke `OrdinaryGet` with `O` being `o2` and `P` being `"foo"`. `O.[[GetOwnProperty]]` returns `undefined`, since `o2` doesn't have an own property called `"foo"`, so we take the if branch in step 3. In step 3.a, we set `parent` to the prototype of `o2` which is `o1`. `parent` is not `null`, so we don't return in step 3.b. In step 3.c, we call the parent's `[[Get]]` method with property key `"foo"`, and return whatever it returns.
 
-The parent (`o1`) is an ordinary object, so its `[[Get]]` method invokes `OrdinaryGet` again, this time with `O` being `o1` and `P` being `"foo"`. In step 2, `O.[[GetOwnProperty]]("foo")` returns the property descriptor associated to `"foo"`. The property descriptor is not `undefined`, so we don't take the if branch in step 3. Next we execute step 4. The property descriptor is a data descriptor, so we return its value, `99`, in step 4, and we're done.
+The parent (`o1`) is an ordinary object, so its `[[Get]]` method invokes `OrdinaryGet` again, this time with `O` being `o1` and `P` being `"foo"`. `o1` has a property called `"foo"`, so in step 2, `O.[[GetOwnProperty]]("foo")` returns the associated Property Descriptor.
+
+[Property Descriptor](https://tc39.es/ecma262/#sec-property-descriptor-specification-type) is a specification type. Data Property Descriptors store the value of the property directly in the `[[Value]]` field. Accessor Property Descriptors store the accessor functions in fields `[[Get]]` and/or `[[Set]]`.
+
+The Property Descriptor returned by `O.[[GetOwnProperty]]("foo")` in step 2 is not `undefined`, so we don't take the if branch in step 3. Next we execute step 4. The Property Descriptor is a Data Descriptor, so we return its `[[Value]]` field, `99`, in step 4, and we're done.
 
 ## What's `Receiver` and where is it coming from?
 
