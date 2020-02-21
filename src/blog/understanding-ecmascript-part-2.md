@@ -16,7 +16,7 @@ tweet: ''
 
 If you haven't had a look at the previous episodes, now it's a good time to do so!
 
-In [part 1](https://v8.dev/blog/understanding-ecmascript-part-1) we read through a simple method — `Object.prorotype.hasOwnProperty` — and **abstract operations** it invokes. We familiarized ourselves with the shorthands `?` and `!` related to error handling. We encountered **language types**, **specification types**, **internal slots** and **internal methods**.
+In [part 1](https://v8.dev/blog/understanding-ecmascript-part-1) we read through a simple method &mdash; `Object.prorotype.hasOwnProperty` &mdash; and **abstract operations** it invokes. We familiarized ourselves with the shorthands `?` and `!` related to error handling. We encountered **language types**, **specification types**, **internal slots** and **internal methods**.
 
 ## Ready for part 2?
 
@@ -75,9 +75,9 @@ We'll see shortly that `Receiver` is the value which is used as the **this value
 > 1. If `getter` is `undefined`, return `undefined`.
 > 1. Return `? Call(getter, Receiver)`.
 
-The prototype chain walk is inside step 3: if we don't find the property as an own property, we recurse into the prototype's `[[Get]]` method.
+The prototype chain walk is inside step 3: if we don't find the property as an own property, we call the prototype's `[[Get]]` method. If we don't find the property there either, we call it's prototype's `[[Get]]` method, and so on, until we reach an object without a prototype.
 
-Let's look at how this algorithm works when we access `o2.foo`. First we invoke `OrdinaryGet` with `O` being `o2` and `P` being `"foo"`. `O.[[GetOwnProperty]]` returns `undefined`, since `o2` doesn't have an own property called `"foo"`, so we take the if branch in step 3. In step 3.a, we set `parent` to the prototype of `o2` which is `o1`. `parent` is not `null`, so we don't return in step 3.b. In step 3.c, we call the parent's `[[Get]]` method with property key `"foo"`, and return whatever it returns.
+Let's look at how this algorithm works when we access `o2.foo`. First we invoke `OrdinaryGet` with `O` being `o2` and `P` being `"foo"`. `O.[[GetOwnProperty]]("foo")` returns `undefined`, since `o2` doesn't have an own property called `"foo"`, so we take the if branch in step 3. In step 3.a, we set `parent` to the prototype of `o2` which is `o1`. `parent` is not `null`, so we don't return in step 3.b. In step 3.c, we call the parent's `[[Get]]` method with property key `"foo"`, and return whatever it returns.
 
 The parent (`o1`) is an ordinary object, so its `[[Get]]` method invokes `OrdinaryGet` again, this time with `O` being `o1` and `P` being `"foo"`. `o1` has a property called `"foo"`, so in step 2, `O.[[GetOwnProperty]]("foo")` returns the associated Property Descriptor.
 
@@ -117,7 +117,7 @@ Let's look at how `GetValue` is defined:
 >     1. Assert: `base` is an Environment Record.
 >     1. Return `? base.GetBindingValue(GetReferencedName(V), IsStrictReference(V))`
 
-The Reference in our example is `o2.foo` which is a property reference. So we take branch 5. We don't take the branch in 5.a, since the base (`o2`) is not a primitive value (a Boolean, String, Symbol, BigInt or Number).
+The Reference in our example is `o2.foo` which is a property reference. So we take branch 5. We don't take the branch in 5.a, since the base (`o2`) is not a primitive value (a Boolean, String, Symbol, BigInt, or Number).
 
 Then we call `[[Get]]` in step 5.b. The `Receiver` we pass is `GetThisValue(V)`. In this case, it's just the base value of the Reference:
 
