@@ -87,11 +87,11 @@ The `Receiver` parameter is only used in the case of accessor properties in step
 
 `OrdinaryGet` passes the original `Receiver` throughout the recursion, unchanged (step 3.c). Let's find out where the `Receiver` is originally coming from!
 
-Searching for places where `[[Get]]` is called we find an abstract operation `GetValue` which operates on References. Reference is a specification type, consisting of a base value, the reference name and a strict reference flag. In the case of `o2.foo`, the base value is the Object `o2`, the reference name is the String `"foo"` and the strict reference flag is `false`, since the example code is sloppy.
+Searching for places where `[[Get]]` is called we find an abstract operation `GetValue` which operates on References. Reference is a specification type, consisting of a base value, the referenced name, and a strict reference flag. In the case of `o2.foo`, the base value is the Object `o2`, the referenced name is the String `"foo"`, and the strict reference flag is `false`, since the example code is sloppy.
 
 ### Side track: References
 
-Side track: A Reference is not a Record, even though it sounds like it could be. It contains three components, which could equally well be expressed as three fixed named values. Here the spec takes a different approach, and defines References as a higher-level data type. This is because of historical reasons.
+Side track: A Reference is not a Record, even though it sounds like it could be. It contains three components, which could equally well be expressed as three fixed named values. Reference is not a Record only because of historical reasons.
 
 ### Back to `GetValue`
 
@@ -113,7 +113,7 @@ Let's look at how `GetValue` is defined:
 >     1. Assert: `base` is an Environment Record.
 >     1. Return `? base.GetBindingValue(GetReferencedName(V), IsStrictReference(V))`
 
-The reference in our example is `o2.foo` which is a property reference. So we take branch 5. We don't take the branch in 5.a, since the base (`o2`) is not a primitive value (a Boolean, String, Symbol, BigInt or Number).
+The Reference in our example is `o2.foo` which is a property reference. So we take branch 5. We don't take the branch in 5.a, since the base (`o2`) is not a primitive value (a Boolean, String, Symbol, BigInt or Number).
 
 Then we call `[[Get]]` in step 5.b. The `Receiver` we pass is `GetThisValue(V)`. In this case, it's just the base value of the Reference:
 
@@ -125,9 +125,9 @@ Then we call `[[Get]]` in step 5.b. The `Receiver` we pass is `GetThisValue(V)`.
 >     1. Return the value of the `thisValue` component of the reference `V`.
 > 1. Return `GetBase(V)`.
 
-For `o2.foo`, we don't take the branch in step 2, since it's not a super reference (such as `super.foo`), but we take step 3 and return the base value of the reference which is `o2`.
+For `o2.foo`, we don't take the branch in step 2, since it's not a Super Reference (such as `super.foo`), but we take step 3 and return the base value of the Reference which is `o2`.
 
-Piecing everything together, we find out that we set the `Receiver` to be the base of the original reference, and then we keep it unchanged during the prototype chain walk. Finally, if the property we find is an accessor property, we use the `Receiver` as the **this value** when calling it.
+Piecing everything together, we find out that we set the `Receiver` to be the base of the original Reference, and then we keep it unchanged during the prototype chain walk. Finally, if the property we find is an accessor property, we use the `Receiver` as the **this value** when calling it.
 
 In particular, the **this value** inside a getter refers to the original object where we tried to get the property from, not the one where we found the property during the prototype chain walk.
 
