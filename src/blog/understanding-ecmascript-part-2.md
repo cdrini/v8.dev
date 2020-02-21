@@ -75,7 +75,7 @@ We'll see shortly that `Receiver` is the value which is used as the **this value
 > 1. If `getter` is `undefined`, return `undefined`.
 > 1. Return `? Call(getter, Receiver)`.
 
-The prototype chain walk is inside step 3: if we don't find the property as an own property, we call the prototype's `[[Get]]` method. If we don't find the property there either, we call it's prototype's `[[Get]]` method, and so on, until we reach an object without a prototype.
+The prototype chain walk is inside step 3: if we don't find the property as an own property, we call the prototype's `[[Get]]` method which delegates to `OrdinaryGet` again. If we still don't find the property, we call it's prototype's `[[Get]]` method, which delegates to `OrdinaryGet` again, and so on, until we either find the property or reach an object without a prototype.
 
 Let's look at how this algorithm works when we access `o2.foo`. First we invoke `OrdinaryGet` with `O` being `o2` and `P` being `"foo"`. `O.[[GetOwnProperty]]("foo")` returns `undefined`, since `o2` doesn't have an own property called `"foo"`, so we take the if branch in step 3. In step 3.a, we set `parent` to the prototype of `o2` which is `o1`. `parent` is not `null`, so we don't return in step 3.b. In step 3.c, we call the parent's `[[Get]]` method with property key `"foo"`, and return whatever it returns.
 
