@@ -93,9 +93,9 @@ The `Receiver` parameter is only used in the case of accessor properties in step
 
 Searching for places where `[[Get]]` is called we find an abstract operation `GetValue` which operates on References. Reference is a specification type, consisting of a base value, the referenced name, and a strict reference flag. In the case of `o2.foo`, the base value is the Object `o2`, the referenced name is the String `"foo"`, and the strict reference flag is `false`, since the example code is sloppy.
 
-### Side track: References
+### Side track: Why is Reference not a Record?
 
-Side track: A Reference is not a Record, even though it sounds like it could be. It contains three components, which could equally well be expressed as three fixed named values. Reference is not a Record only because of historical reasons.
+Side track: Reference is not a Record, even though it sounds like it could be. It contains three components, which could equally well be expressed as three named fields. Reference is not a Record only because of historical reasons.
 
 ### Back to `GetValue`
 
@@ -154,7 +154,7 @@ It works! We were able to predict the behavior of this code snippet based on wha
 
 ## Accessing properties - why does it invoke `[[Get]]`?
 
-But where does the spec say that the Object internal method `[[Get]]` will get invoked when accessing a property like `o2.foo`? Surely that has to be defined somewhere. Don't take my word for it!
+Where does the spec say that the Object internal method `[[Get]]` will get invoked when accessing a property like `o2.foo`? Surely that has to be defined somewhere. Don't take my word for it!
 
 We found out that the Object internal method `[[Get]]` is called from the abstract operation `GetValue` which operates on References. But where is `GetValue` called from?
 
@@ -162,9 +162,9 @@ We found out that the Object internal method `[[Get]]` is called from the abstra
 
 The grammar rules of the spec define the syntax of the language. [Runtime semantics](https://tc39.es/ecma262/#sec-runtime-semantics) define what the syntactic constructs "mean" (how to evaluate them at runtime).
 
-We'll take a deeper look into the grammar rules in a later episode, let's keep it simple for now! In particular, we can ignore the subscripts (`Yield`, `Await` and so on) in the productions for this episode.
+If you're not familiar with [context-free grammars](https://en.wikipedia.org/wiki/Context-free_grammar), it's a good idea to have a look now!
 
-(If you're not familiar with [context-free grammars](https://en.wikipedia.org/wiki/Context-free_grammar), it's a good idea to have a look now!)
+We'll take a deeper look into the grammar rules in a later episode, let's keep it simple for now! In particular, we can ignore the subscripts (`Yield`, `Await` and so on) in the productions for this episode.
 
 The following productions describe how a `MemberExpression` looks like:
 
@@ -182,7 +182,7 @@ Here we have 8 productions for `MemberExpression`. A `MemberExpression` can be j
 
 Runtime semantics for the production `MemberExpression : MemberExpression . IdentifierName` define the set of steps to take when evaluating it:
 
-::ecmascript-algorithm
+:::ecmascript-algorithm
 > [Runtime Semantics: Evaluation for `MemberExpression : MemberExpression . IdentifierName`](https://tc39.es/ecma262/#sec-property-accessors-runtime-semantics-evaluation)
 >
 > 1. Let `baseReference` be the result of evaluating `MemberExpression`.
@@ -258,13 +258,13 @@ In this case, the behavior is defined in the runtime semantics for the `Assignme
 > 1. Perform `? DestructuringAssignmentEvaluation` of `assignmentPattern` using `rval` as the argument.
 > 1. Return `rval`.
 
-Now the `LeftHandSideExpression` (`x`) is not an object literal or an array literal, so we take the if branch in step 1. In step 1.a, we evaluate the left-hand side (`x`) and store the result into `lref`. `o2.foo` is not a function definition, so we don't take the if branch in 1.c, but the else branch in 1.d. There we evaluate `o2.foo` and call `GetValue` on it.
+Now the `LeftHandSideExpression` (`x`) is not an object literal or an array literal, so we take the if branch in step 1. In step 1.a, we evaluate the left-hand side (`x`) and store the result into `lref`.  The `AssignmentExpression`, `o2.foo`, is not a function definition, so we don't take the if branch in 1.c, but the else branch in 1.d. There we evaluate `o2.foo` and call `GetValue` on it.
 
 In any case, `GetValue` will be called on the Reference which is the result of evaluating `o2.foo`. Thus, we know that the Object internal method `[[Get]]` will get invoked when accessing a property on an Object, and the prototype chain walk will occur.
 
 ### Why is `o2.foo` an `AssignmentExpression`?
 
-Just one more thing. Previously, we used `o2.foo` as an `AssignmentExpression`. It doesn't look like one though. Why is it an `AssignmentExpression`?
+Just one more thing. Previously, we said that`o2.foo` is an `AssignmentExpression`. It doesn't look like one though. Why is it an `AssignmentExpression`?
 
 The spec actually allows an `AssignmentExpression` both as an argument and as the right hand side of an assignment. For example:
 
@@ -351,7 +351,7 @@ So, `o2.foo` is a `MemberExpression` if `o2` is a valid `MemberExpression`. Luck
 >
 > [`IdentifierReference : Identifier`](https://tc39.es/ecma262/#prod-IdentifierReference)
 
-`o2` is surely an `Identifier` so we're good.
+`o2` is surely an `Identifier` so we're good. `o2` is a `MemberExpression`, so `o2.foo` is also a `MemberExpression`. A `MemberExpression` is a valid `AssignmentExpression`, so `o2.foo` is an `AssignmentExpression` too.
 
 ## Summary
 
