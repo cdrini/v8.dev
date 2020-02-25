@@ -223,9 +223,9 @@ In this case, the behavior is defined in the runtime semantics of `ArgumentList`
 > 1. Let `arg` be `? GetValue(ref)`.
 > 1. Return a List whose sole item is `arg`.
 
-`o2.foo` doesn't look like an `AssignmentExpression` but it is one, so this production is applicable. [Extra content explaining why it's an `AssignmentExpression`](/blog/extras/understanding-ecmascript-part-2-extra).
+`o2.foo` doesn't look like an `AssignmentExpression` but it is one, so this production is applicable. To find out why, you can check out this [extra content](/blog/extras/understanding-ecmascript-part-2-extra), but it's not strictly necessary at this point.
 
-So, the `AssignmentExpression` is `o2.foo`. `ref`, the result of evaluating `o2.foo`, is the above mentioned Reference. Now we call `GetValue` on it. Thus, we know that the Object internal method `[[Get]]` will get invoked, and the prototype chain walk will occur.
+The `AssignmentExpression` in step 1 is `o2.foo`. `ref`, the result of evaluating `o2.foo`, is the above mentioned Reference. In step 2 we call `GetValue` on it. Thus, we know that the Object internal method `[[Get]]` will get invoked, and the prototype chain walk will occur.
 
 ## Summary
 
