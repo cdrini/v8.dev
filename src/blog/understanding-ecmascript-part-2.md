@@ -158,7 +158,7 @@ Where does the spec say that the Object internal method `[[Get]]` will get invok
 
 We found out that the Object internal method `[[Get]]` is called from the abstract operation `GetValue` which operates on References. But where is `GetValue` called from?
 
-### Runtime Semantics
+### Runtime Semantics for `MemberExpression`
 
 The grammar rules of the spec define the syntax of the language. [Runtime semantics](https://tc39.es/ecma262/#sec-runtime-semantics) define what the syntactic constructs "mean" (how to evaluate them at runtime).
 
@@ -205,6 +205,8 @@ The algorithm delegates to the abstract operation `EvaluatePropertyAccessWithIde
 That is: `EvaluatePropertyAccessWithIdentifierKey` constructs a Reference which uses the provided `baseValue` as the base, the string value of `identifierName` as the property name, and `strict` as the strict mode flag.
 
 Eventually this Reference gets passed to `GetValue`. This is defined in several places in the spec, depending on how the Reference ends up being used.
+
+### `MemberExpression` as a parameter
 
 In our example, we use the property access as a parameter:
 
