@@ -105,19 +105,19 @@ Let's look at how `GetValue` is defined:
 > [`GetValue ( V )`](https://tc39.es/ecma262/#sec-getvalue)
 >
 > 1. `ReturnIfAbrupt(V)`.
-> 2. If `Type(V)` is not `Reference`, return `V`.
-> 3. Let `base` be `GetBase(V)`.
-> 4. If `IsUnresolvableReference(V)` is `true`, throw a `ReferenceError` exception.
-> 5. If `IsPropertyReference(V)` is `true`, then
+> 1. If `Type(V)` is not `Reference`, return `V`.
+> 1. Let `base` be `GetBase(V)`.
+> 1. If `IsUnresolvableReference(V)` is `true`, throw a `ReferenceError` exception.
+> 1. If `IsPropertyReference(V)` is `true`, then
 >     1. If `HasPrimitiveBase(V)` is `true`, then
 >         1. Assert: In this case, `base` will never be `undefined` or `null`.
 >         1. Set `base` to `! ToObject(base)`.
 >     1. Return `? base.[[Get]](GetReferencedName(V), GetThisValue(V))`.
-> 6. Else,
+> 1. Else,
 >     1. Assert: `base` is an Environment Record.
 >     1. Return `? base.GetBindingValue(GetReferencedName(V), IsStrictReference(V))`
 
-The Reference in our example is `o2.foo` which is a property reference. So we take branch 5. We don't take the branch in 5.a, since the base (`o2`) is not a primitive value (a Boolean, String, Symbol, BigInt, or Number).
+The Reference in our example is `o2.foo`, which is a property reference. So we take branch 5. We don't take the branch in 5.a, since the base (`o2`) is not a primitive value (a Boolean, String, Symbol, BigInt, or Number).
 
 Then we call `[[Get]]` in step 5.b. The `Receiver` we pass is `GetThisValue(V)`. In this case, it's just the base value of the Reference:
 
@@ -178,7 +178,7 @@ The following productions describe how a `MemberExpression` looks like:
 > `MetaProperty`
 > `new MemberExpression Arguments`
 
-Here we have 8 productions for `MemberExpression`. A `MemberExpression` can be just a `PrimaryExpression`. Alternatively, a `MemberExpression` can be constructed from another `MemberExpression` and `Expression` by piecing them together: `MemberExpression [ Expression ]`, for example `o2['foo']`. Or it can be `MemberExpression . IdentifierName`, for example `o2.foo` &mdash; this is the production relevant for our example.
+Here we have 7 productions for `MemberExpression`. A `MemberExpression` can be just a `PrimaryExpression`. Alternatively, a `MemberExpression` can be constructed from another `MemberExpression` and `Expression` by piecing them together: `MemberExpression [ Expression ]`, for example `o2['foo']`. Or it can be `MemberExpression . IdentifierName`, for example `o2.foo` &mdash; this is the production relevant for our example.
 
 Runtime semantics for the production `MemberExpression : MemberExpression . IdentifierName` define the set of steps to take when evaluating it:
 
